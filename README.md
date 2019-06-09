@@ -1,60 +1,105 @@
 # Anaconda: Tic-Tac-Toe Coding Challenge
-Your mission, should you choose to accept it, is to implement a two-player game of Tic-tac-toe in the web browser.
 
-## Rules
+Eventsourced solution to Anaconda tic-tac-toe challenge.
 
-HONOR RULES: You must do this challenge on your own, without assistance or review from others, and without copying from the Internet. You will be asked to affirm that you developed your work independently.
+## Technological Stack
 
-TIME LIMIT: You have 3 days from the date you receive a link to this site. You may submit your work earlier.
+* Python 3.7
+* Falcon
+* pytest
 
-TASK: Your task it implement a simple but comprehensive REST API for a [tic-tac-toe game](https://en.wikipedia.org/wiki/Tic-tac-toe)
+## How to run
 
-## Requirements
+If you want to run tests:
 
-The basic requirements for the game are:
+```sh
+make test
+```
 
-store a game board data structure that contains the game information
-allow two players to enter their names, and automatically assign one of them the circle and the other the 'x'allow each to play a turn, one at a time, during which the player selects a square of the board and it is filled in with their symbol
-indicate when one of the players has won, or the game is a draw
-In addition to implementing basic gameplay, the user must be able to save their game to the server.
+If you want to run dev server (gunicorn with `--reload`):
 
-Since this is a coding challenge, the success of your mission depends on building a good rest API implementation. 
+```sh
+make run-dev
+```
 
-Make sure to provide instruction about how to setup, run and consume your REST API.
+Application will start at port 8080
 
-## Technologies
+## API
 
-We prefer Python and the tornado framework, but they are not required. You can use whatever technology you prefer.
+* `GET /api/games`: Return a list of the Games known to the server, as JSON.
 
-Game data structure
-A game consists of:
+Response:
 
-two players, represented by their names as strings
-a board data structure (we are leaving you the choice of what data structure is more appropriate for the task). Keep in mind that this data structure needs to trak the status of each board element. Each element is null if the square is blank, or either 0 or 1 to indicate which player controls the square. 
+```json
+{
+  "<uuid>": {
+    "state": "<PENDING|PLAYABLE|FINISHED>",
+    "players": ["alice", "bob"],
+    "board": [
+      [0, 1, null],
+      [0, 1, null],
+      [null, null, null]
+    ],
+    "winner": null
+  }
+}
+```
 
-Server API
-The server should complies with the JSON API specification.
+* `POST /api/games`: Create a new Game, assigning it an ID and returning the newly created Game ID.
 
-- `GET /api/games`: Return a list of the Games known to the server, as JSON.
+Request:
+
+```json
+{
+  "board_side": 2
+}
+```
+
+Response:
+
+```json
+{
+  "id": "<uuid>"
+}
+```
+
+* `GET /api/games/<id>`: Retrieve a Game by its ID, returning a 404 status code if no game with that ID exists.
+
+Response:
+
+```json
+{
+    "state": "<PENDING|PLAYABLE|FINISHED>",
+    "players": ["alice", "bob"],
+    "board": [
+      [0, 1, null],
+      [0, 1, null],
+      [null, null, null]
+    ],
+    "winner": null
+}
+```
+
+* `POST /api/games/<id>`: Join or make the move in the Game with the given ID.
+
+Initial join request:
+
+```json
+{
+  "player": "alice"
+}
+```
+
+Move request:
+
+```json
+{
+  "player": "alice",
+  "cell": {
+    "row": 0,
+    "col": 0
+  }
+}
+```
 
 
-- `POST /api/games`: Create a new `Game`, assigning it an ID and returning the newly created `Game`.
-
-- `GET /api/games/<id>`: Retrieve a `Game` by its ID, returning a `404` status
-  code if no game with that ID exists.
-
-- `POST /api/games/<id>`: Update the `Game` with the given ID, replacing its data with the newly `POST`ed data.
-
-## Optional
-
-If you have extra time and want to take on an additional challenge, you may choose to implement:
-
- - viewing & restoring saved games
- - an "AI" player option, where someone can play against the computer
-
-However, please be aware that we'd prefer a more polished implementation to more features!
-
-## Submission
-
-When you are ready, please submit your challenge as a pull request
-against this repository.

@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  api:
+    build: .
+    volumes:
+      - ".:/source-code"
+    ports:
+      - "8080:8080"
+    command: ["gunicorn", "-b", "0.0.0.0:8080", "tictactoe.api.wsgi:app", "--reload"]
